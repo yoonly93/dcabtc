@@ -1,12 +1,24 @@
 feather.replace();
 
-// 업비트 KRW-BTC 가격 가져오기
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('calculateBtn').addEventListener('click', calculateBTC);
+});
+
+// 업비트 KRW-BTC 현재가 가져오기
 async function fetchBtcPrice() {
-  const res = await fetch('https://api.upbit.com/v1/ticker?markets=KRW-BTC');
-  const data = await res.json();
-  return parseFloat(data[0].trade_price);
+  try {
+    const res = await fetch('https://api.upbit.com/v1/ticker?markets=KRW-BTC');
+    const data = await res.json();
+    // trade_price: 현재가
+    return parseFloat(data[0].trade_price);
+  } catch (err) {
+    console.error('BTC 가격 가져오기 실패:', err);
+    alert('BTC 가격을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.');
+    return null;
+  }
 }
 
+// 금액 포맷
 function formatWon(value) {
   return value.toLocaleString() + '원';
 }
@@ -17,6 +29,7 @@ function formatInvestmentDisplay(value) {
   return value.toLocaleString() + '원';
 }
 
+// 투입금액 클리어 아이콘 토글
 function toggleClearIcon() {
   const input = document.getElementById('monthlyInvestment');
   const btn = document.getElementById('clearBtn');
@@ -38,6 +51,7 @@ function addInvestment(amount) {
   toggleClearIcon();
 }
 
+// 계산 함수
 async function calculateBTC() {
   const targetBtc = parseFloat(document.getElementById('targetBtc').value);
   const monthlyInvestment = parseInt(document.getElementById('monthlyInvestment').value);
@@ -48,6 +62,7 @@ async function calculateBTC() {
   }
 
   const startPrice = await fetchBtcPrice();
+  if (!startPrice) return;
 
   let currentBtcPrice = startPrice;
   let month = 0;
