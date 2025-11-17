@@ -4,11 +4,9 @@ let currentBtcPrice = null;
 let isFallback = false;
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // 페이지 로드 시 한 번만 BTC 가격 fetch
+  // 페이지 로드 시 서버리스 API 호출
   try {
-    const res = await fetch('https://api.upbit.com/v1/ticker?markets=KRW-BTC', {
-      headers: { "Accept": "application/json" }
-    });
+    const res = await fetch('/api/btc-price');
     const data = await res.json();
     currentBtcPrice = parseFloat(data[0].trade_price);
   } catch (err) {
@@ -17,15 +15,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     isFallback = true;
   }
 
-  // 계산 버튼
   document.getElementById('calculateBtn')
           .addEventListener('click', calculateBTC);
 
-  // 투입금액 인풋 이벤트
   const investmentInput = document.getElementById('monthlyInvestment');
   investmentInput.addEventListener('input', updateInvestmentDisplay);
 
-  // 초기 표시
   updateInvestmentDisplay();
 });
 
@@ -40,7 +35,6 @@ function formatInvestmentDisplay(value) {
   return value.toLocaleString() + '원';
 }
 
-// 투입금액 표시 업데이트
 function updateInvestmentDisplay() {
   const input = document.getElementById('monthlyInvestment');
   const value = parseInt(input.value) || 0;
@@ -48,21 +42,18 @@ function updateInvestmentDisplay() {
   toggleClearIcon();
 }
 
-// clear 아이콘 표시
 function toggleClearIcon() {
   const input = document.getElementById('monthlyInvestment');
   const btn = document.getElementById('clearBtn');
   btn.style.display = input.value ? 'block' : 'none';
 }
 
-// clear 버튼 클릭
 function clearInvestment() {
   const input = document.getElementById('monthlyInvestment');
   input.value = '';
   updateInvestmentDisplay();
 }
 
-// 버튼으로 금액 더하기
 function addInvestment(amount) {
   const input = document.getElementById('monthlyInvestment');
   let current = parseInt(input.value) || 0;
@@ -71,7 +62,6 @@ function addInvestment(amount) {
   updateInvestmentDisplay();
 }
 
-// 계산 함수
 async function calculateBTC() {
   const targetBtc = parseFloat(document.getElementById('targetBtc').value);
   const monthlyInvestment = parseInt(document.getElementById('monthlyInvestment').value);
@@ -84,19 +74,18 @@ async function calculateBTC() {
   let price = currentBtcPrice;
   if (!price) return alert('BTC 가격을 가져오지 못했습니다.');
 
-  const MAX_MONTHS = 1200; // 최대 루프 제한
+  const MAX_MONTHS = 1200;
   let month = 0;
   let accumulatedBtc = 0;
 
   const tbody = document.getElementById('monthlyTable');
-  tbody.innerHTML = ''; // 초기화
+  tbody.innerHTML = '';
 
   while (accumulatedBtc < targetBtc && month < MAX_MONTHS) {
     month++;
     const btcBought = monthlyInvestment / price;
     accumulatedBtc += btcBought;
 
-    // DOM으로 tr 생성
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td class="border px-2 py-1">${month}개월차</td>
@@ -117,7 +106,6 @@ async function calculateBTC() {
   document.getElementById('totalInvestment').textContent = formatInvestmentDisplay(month * monthlyInvestment);
   document.getElementById('resultCard').style.display = 'flex';
 
-  // fallback 주의문구
   document.getElementById('fallbackNotice').textContent = isFallback
     ? '현재 비트코인 가격을 실시간으로 가져올 수 없어, 가장 최근에 확인된 가격으로 계산하고 있습니다. 실제 가격과 다를 수 있습니다.'
     : '';
