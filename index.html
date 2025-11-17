@@ -49,7 +49,7 @@
   <div class="max-w-xl mx-auto mt-6 bg-white p-6 rounded-xl shadow-md space-y-3" id="resultCard" style="display:none;">
     <h2 class="text-lg font-bold">계산 결과</h2>
     <p>필요기간: <span id="requiredMonths"></span>개월</p>
-    <p>총 투입 금액: <span id="totalInvestment"></span>원</p>
+    <p>총 투입 금액: <span id="totalInvestment"></span></p>
   </div>
 
   <!-- 주의사항 -->
@@ -59,10 +59,10 @@
     <p>각 월의 BTC 가격 = 이전 월 가격 × (1 + 월별상승률/100)</p>
   </div>
 
-  <!-- 참고 버튼 (확인하기 버튼과 동일 스타일) -->
+  <!-- 참고 버튼 -->
   <div class="max-w-xl mx-auto mt-4 text-center">
     <a href="https://btc-reach-calculator.vercel.app/" target="_blank"
-       class="inline-block w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded transition-colors text-center">
+       class="inline-block w-full bg-white text-orange-500 border border-orange-500 font-semibold py-2 px-4 rounded hover:bg-orange-50 transition-colors text-center">
       한국에서 지금 200만원으로 비트코인을 사면 실제로 몇 개를 살 수 있을까?
     </a>
   </div>
@@ -91,7 +91,7 @@
       try {
         const res = await fetch('https://api.upbit.com/v1/ticker?markets=KRW-BTC');
         const data = await res.json();
-        return parseFloat(data[0].trade_price); // 현재가
+        return parseFloat(data[0].trade_price);
       } catch (err) {
         console.error('업비트 BTC 가격 조회 실패', err);
         return 50000000; // fallback
@@ -102,17 +102,26 @@
       return value.toLocaleString() + '원';
     }
 
+    function formatInvestmentDisplay(value) {
+      if (!value || value <= 0) return '0원';
+      if (value >= 10000) {
+        return Math.round(value / 10000).toLocaleString() + '만원';
+      } else {
+        return value.toLocaleString() + '원';
+      }
+    }
+
     function toggleClearIcon() {
       const input = document.getElementById('monthlyInvestment');
       const btn = document.getElementById('clearBtn');
       btn.style.display = input.value ? 'block' : 'none';
+      document.getElementById('investmentDisplay').textContent = formatInvestmentDisplay(parseInt(input.value));
     }
 
     function clearInvestment() {
       const input = document.getElementById('monthlyInvestment');
       input.value = '';
       toggleClearIcon();
-      document.getElementById('investmentDisplay').textContent = '0원';
     }
 
     function addInvestment(amount) {
@@ -121,7 +130,6 @@
       current += amount;
       input.value = current;
       toggleClearIcon();
-      document.getElementById('investmentDisplay').textContent = formatWon(current);
     }
 
     async function calculateBTC() {
@@ -147,7 +155,7 @@
 
         monthlyTableHtml += `<tr>
           <td class="border px-2 py-1">${month}개월차</td>
-          <td class="border px-2 py-1">${formatWon(monthlyInvestment)}</td>
+          <td class="border px-2 py-1">${formatInvestmentDisplay(monthlyInvestment)}</td>
           <td class="border px-2 py-1">${formatWon(Math.round(currentBtcPrice))}</td>
           <td class="border px-2 py-1">${btcBought.toFixed(6)}</td>
           <td class="border px-2 py-1">${accumulatedBtc.toFixed(6)}</td>
@@ -157,7 +165,7 @@
       }
 
       document.getElementById('requiredMonths').textContent = month;
-      document.getElementById('totalInvestment').textContent = formatWon(month * monthlyInvestment);
+      document.getElementById('totalInvestment').textContent = formatInvestmentDisplay(month * monthlyInvestment);
       document.getElementById('monthlyTable').innerHTML = monthlyTableHtml;
       document.getElementById('resultCard').style.display = 'block';
     }
