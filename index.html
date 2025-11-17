@@ -3,34 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BTC 목표 투자 계산기</title>
+  <title>비트코인 목표 수량 투자 계산기</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/feather-icons"></script>
+  <script src="app.js" defer></script>
 </head>
 <body class="bg-gray-50 p-4">
 
   <!-- 상단 카드형 입력 -->
-  <div class="max-w-xl mx-auto bg-white p-6 rounded-xl shadow-md space-y-4">
-    <h1 class="text-xl font-bold text-center">비트코인 목표 투자 계산기</h1>
+  <div class="max-w-xl mx-auto bg-white p-6 rounded-xl shadow-lg space-y-4" id="inputCard">
+    <h1 class="text-2xl font-bold text-center">비트코인 목표 수량 투자 계산기</h1>
 
     <!-- 목표 BTC -->
     <div>
       <label class="block font-medium mb-1">목표 비트코인 개수</label>
-      <input type="number" id="targetBtc" class="w-full border p-2 rounded" placeholder="예: 0.5">
+      <input type="number" id="targetBtc" class="w-full border p-3 rounded-lg text-lg" placeholder="예: 0.5">
     </div>
 
-    <!-- 월별 투자금액 -->
+    <!-- 투입금액 -->
     <div class="relative">
-      <label class="block font-medium mb-1">월별 투자금액</label>
-      <input type="number" id="monthlyInvestment" class="w-full border p-2 rounded pr-8" placeholder="예: 1000000" oninput="toggleClearIcon()">
-      <!-- Clear 버튼 아이콘 -->
-      <button id="clearBtn" class="absolute right-2 top-2 text-gray-400 hidden" onclick="clearInvestment()">
+      <label class="block font-medium mb-1">투입금액</label>
+      <input type="number" id="monthlyInvestment" class="w-full border p-3 rounded-lg pr-12 text-lg" placeholder="예: 1000000" oninput="toggleClearIcon()">
+      <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer" id="clearBtn" style="display:none;" onclick="clearInvestment()">
         <i data-feather="x-circle"></i>
-      </button>
+      </span>
       <div class="flex space-x-2 mt-2">
-        <button type="button" onclick="addInvestment(100000)" class="flex-1 bg-gray-200 px-3 py-1 rounded">+10만원</button>
-        <button type="button" onclick="addInvestment(1000000)" class="flex-1 bg-gray-200 px-3 py-1 rounded">+100만원</button>
-        <button type="button" onclick="addInvestment(10000000)" class="flex-1 bg-gray-200 px-3 py-1 rounded">+1000만원</button>
+        <button type="button" onclick="addInvestment(100000)" class="flex-1 bg-gray-200 px-3 py-2 rounded-lg">+10만원</button>
+        <button type="button" onclick="addInvestment(1000000)" class="flex-1 bg-gray-200 px-3 py-2 rounded-lg">+100만원</button>
+        <button type="button" onclick="addInvestment(10000000)" class="flex-1 bg-gray-200 px-3 py-2 rounded-lg">+1000만원</button>
       </div>
       <div class="text-sm text-gray-500 mt-1" id="investmentDisplay">0원</div>
     </div>
@@ -38,145 +38,56 @@
     <!-- 월별 상승률 -->
     <div>
       <label class="block font-medium mb-1">월별 예상 상승률 (%)</label>
-      <input type="number" id="monthlyRate" class="w-full border p-2 rounded" value="5">
+      <input type="number" id="monthlyRate" class="w-full border p-3 rounded-lg text-lg" value="5">
     </div>
 
     <!-- 확인하기 버튼 -->
-    <button onclick="calculateBTC()" class="w-full bg-orange-500 text-white py-2 rounded font-semibold">확인하기</button>
+    <button id="calculateBtn" class="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold text-lg hover:bg-orange-600 transition-colors">확인하기</button>
   </div>
 
-  <!-- 결과 영역 -->
-  <div class="max-w-xl mx-auto mt-6 bg-white p-6 rounded-xl shadow-md space-y-3" id="resultCard" style="display:none;">
-    <h2 class="text-lg font-bold">계산 결과</h2>
-    <p>필요 투자기간: <span id="requiredMonths"></span>개월</p>
-    <p>총 투자 금액: <span id="totalInvestment"></span>원</p>
+  <!-- 계산 결과 카드 -->
+  <div class="max-w-xl mx-auto mt-6 bg-white p-6 rounded-xl shadow-lg flex space-x-4 justify-around" id="resultCard" style="display:none;">
+    <div class="flex-1 bg-orange-100 p-4 rounded-lg text-center">
+      <p class="text-gray-600 font-medium">필요기간</p>
+      <p class="text-2xl font-bold" id="requiredMonths"></p>
+    </div>
+    <div class="flex-1 bg-green-100 p-4 rounded-lg text-center">
+      <p class="text-gray-600 font-medium">총 투입 금액</p>
+      <p class="text-2xl font-bold" id="totalInvestment"></p>
+    </div>
   </div>
 
-  <!-- 주의사항 -->
-  <div class="max-w-xl mx-auto mt-4 bg-yellow-100 p-4 rounded-lg text-sm text-gray-700 space-y-1">
+  <!-- 주의문구 -->
+  <div class="max-w-xl mx-auto mt-4 bg-yellow-100 p-4 rounded-lg text-sm text-gray-700 space-y-2">
+    <p class="font-semibold text-orange-600">주의사항</p>
     <p>이 계산기는 교육적 목적의 시뮬레이션이며, 실제 결과를 보장하지 않습니다.</p>
-    <p>이 계산은 비트코인 가격이 매월 설정한 %만큼 꾸준히 상승한다고 가정합니다.</p>
-    <p>각 월의 BTC 가격 = 이전 월 가격 × (1 + 월별상승률/100)</p>
+    <p class="font-medium mt-2">계산 방식:</p>
+    <p class="ml-2">각 월의 BTC 가격 = 이전 월 가격 × (1 + 월별상승률/100)</p>
+    <p class="ml-2">비트코인 가격은 매월 설정한 %만큼 꾸준히 상승한다고 가정합니다.</p>
   </div>
 
   <!-- 참고 버튼 -->
   <div class="max-w-xl mx-auto mt-4 text-center">
-    <a href="https://btc-reach-calculator.vercel.app/" target="_blank" class="text-blue-600 underline">
+    <a href="https://btc-reach-calculator.vercel.app/" target="_blank"
+       class="inline-block w-full bg-white text-orange-500 border border-orange-500 font-semibold py-3 px-4 rounded-lg hover:bg-orange-50 transition-colors">
       한국에서 지금 200만원으로 비트코인을 사면 실제로 몇 개를 살 수 있을까?
     </a>
   </div>
 
-  <!-- 광고 영역 (숨김 처리) -->
-  <!--
-  <div class="max-w-xl mx-auto mt-6 space-y-2">
-    <div class="bg-gray-200 h-24 flex items-center justify-center">쿠팡 광고</div>
-    <div class="bg-gray-300 h-24 flex items-center justify-center">구글 광고</div>
-  </div>
-  -->
-
   <!-- 월별 테이블 -->
   <div class="max-w-xl mx-auto mt-6 overflow-x-auto">
-    <table class="w-full table-auto border border-gray-300">
-      <thead class="bg-gray-100">
+    <table class="w-full table-auto border border-gray-200 bg-white rounded-lg">
+      <thead class="bg-gray-50">
         <tr>
           <th class="border px-2 py-1">월차</th>
-          <th class="border px-2 py-1">투자금액</th>
           <th class="border px-2 py-1">해당월 BTC 가격</th>
           <th class="border px-2 py-1">구매 BTC</th>
           <th class="border px-2 py-1">누적 BTC</th>
         </tr>
       </thead>
-      <tbody id="monthlyTable">
-      </tbody>
+      <tbody id="monthlyTable"></tbody>
     </table>
   </div>
-
-  <script>
-    feather.replace();
-
-    // BTC/KRW 가격 fetch (CORS 프록시 적용)
-    async function fetchBtcPrice() {
-      try {
-        const url = encodeURIComponent('https://api.bithumb.com/public/ticker/KRW-BTC');
-        const res = await fetch(`https://api.allorigins.win/get?url=${url}`);
-        const data = await res.json();
-        const btcData = JSON.parse(data.contents);
-        if (btcData.status === '0000') {
-          return parseFloat(btcData.data.closing_price);
-        } else {
-          console.error('빗썸 API 오류', btcData);
-          return 50000000; // fallback
-        }
-      } catch (err) {
-        console.error('가격 조회 실패', err);
-        return 50000000; // fallback
-      }
-    }
-
-    function formatWon(value) {
-      return value.toLocaleString() + '원';
-    }
-
-    function toggleClearIcon() {
-      const input = document.getElementById('monthlyInvestment');
-      const btn = document.getElementById('clearBtn');
-      btn.style.display = input.value ? 'block' : 'none';
-    }
-
-    function clearInvestment() {
-      const input = document.getElementById('monthlyInvestment');
-      input.value = '';
-      toggleClearIcon();
-      document.getElementById('investmentDisplay').textContent = '0원';
-    }
-
-    function addInvestment(amount) {
-      const input = document.getElementById('monthlyInvestment');
-      let current = parseInt(input.value) || 0;
-      current += amount;
-      input.value = current;
-      toggleClearIcon();
-      document.getElementById('investmentDisplay').textContent = formatWon(current);
-    }
-
-    async function calculateBTC() {
-      const targetBtc = parseFloat(document.getElementById('targetBtc').value);
-      const monthlyInvestment = parseInt(document.getElementById('monthlyInvestment').value);
-      const monthlyRate = parseFloat(document.getElementById('monthlyRate').value) / 100;
-
-      if (!targetBtc || !monthlyInvestment || monthlyInvestment <= 0) {
-        return alert('모든 값을 입력해주세요.');
-      }
-
-      const startPrice = await fetchBtcPrice();
-
-      let currentBtcPrice = startPrice;
-      let month = 0;
-      let accumulatedBtc = 0;
-      let monthlyTableHtml = '';
-
-      while (accumulatedBtc < targetBtc) {
-        month++;
-        const btcBought = monthlyInvestment / currentBtcPrice;
-        accumulatedBtc += btcBought;
-
-        monthlyTableHtml += `<tr>
-          <td class="border px-2 py-1">${month}개월차</td>
-          <td class="border px-2 py-1">${formatWon(monthlyInvestment)}</td>
-          <td class="border px-2 py-1">${formatWon(Math.round(currentBtcPrice))}</td>
-          <td class="border px-2 py-1">${btcBought.toFixed(6)}</td>
-          <td class="border px-2 py-1">${accumulatedBtc.toFixed(6)}</td>
-        </tr>`;
-
-        currentBtcPrice *= (1 + monthlyRate);
-      }
-
-      document.getElementById('requiredMonths').textContent = month;
-      document.getElementById('totalInvestment').textContent = formatWon(month * monthlyInvestment);
-      document.getElementById('monthlyTable').innerHTML = monthlyTableHtml;
-      document.getElementById('resultCard').style.display = 'block';
-    }
-  </script>
 
 </body>
 </html>
