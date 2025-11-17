@@ -1,15 +1,18 @@
+feather.replace();
+
 let currentBtcPrice = null;
 let isFallback = false;
 
-// 페이지 로드 시 한 번만 가격 fetch
 document.addEventListener('DOMContentLoaded', async () => {
   try {
-    const res = await fetch('https://api.upbit.com/v1/ticker?markets=KRW-BTC');
+    const res = await fetch('https://api.upbit.com/v1/ticker?markets=KRW-BTC', {
+      headers: { "Accept": "application/json" }
+    });
     const data = await res.json();
     currentBtcPrice = parseFloat(data[0].trade_price);
   } catch (err) {
     console.warn('실시간 가격 가져오기 실패:', err);
-    currentBtcPrice = 141000000; // fallbackPrice 예시값
+    currentBtcPrice = 141000000; // fallbackPrice
     isFallback = true;
   }
 
@@ -17,6 +20,40 @@ document.addEventListener('DOMContentLoaded', async () => {
           .addEventListener('click', calculateBTC);
 });
 
+// 금액 포맷
+function formatWon(value) {
+  return value.toLocaleString() + '원';
+}
+
+function formatInvestmentDisplay(value) {
+  if (!value || value <= 0) return '0원';
+  if (value >= 10000) return Math.round(value / 10000).toLocaleString() + '만원';
+  return value.toLocaleString() + '원';
+}
+
+// 투입금액 클리어 아이콘
+function toggleClearIcon() {
+  const input = document.getElementById('monthlyInvestment');
+  const btn = document.getElementById('clearBtn');
+  btn.style.display = input.value ? 'block' : 'none';
+  document.getElementById('investmentDisplay').textContent = formatInvestmentDisplay(parseInt(input.value));
+}
+
+function clearInvestment() {
+  const input = document.getElementById('monthlyInvestment');
+  input.value = '';
+  toggleClearIcon();
+}
+
+function addInvestment(amount) {
+  const input = document.getElementById('monthlyInvestment');
+  let current = parseInt(input.value) || 0;
+  current += amount;
+  input.value = current;
+  toggleClearIcon();
+}
+
+// 계산 함수
 async function calculateBTC() {
   const targetBtc = parseFloat(document.getElementById('targetBtc').value);
   const monthlyInvestment = parseInt(document.getElementById('monthlyInvestment').value);
@@ -40,7 +77,7 @@ async function calculateBTC() {
 
     monthlyTableHtml += `<tr>
       <td class="border px-2 py-1">${month}개월차</td>
-      <td class="border px-2 py-1">${price.toLocaleString()}원</td>
+      <td class="border px-2 py-1">${formatWon(Math.round(price))}</td>
       <td class="border px-2 py-1">${btcBought.toFixed(6)}</td>
       <td class="border px-2 py-1">${accumulatedBtc.toFixed(6)}</td>
     </tr>`;
