@@ -1,7 +1,9 @@
 feather.replace();
 
+// DOM 준비 후 버튼 이벤트 연결
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('calculateBtn').addEventListener('click', calculateBTC);
+  document.getElementById('calculateBtn')
+          .addEventListener('click', calculateBTC);
 });
 
 // 업비트 KRW-BTC 현재가 가져오기
@@ -9,7 +11,7 @@ async function fetchBtcPrice() {
   try {
     const res = await fetch('https://api.upbit.com/v1/ticker?markets=KRW-BTC');
     const data = await res.json();
-    // trade_price: 현재가
+    console.log('업비트 BTC 가격:', data[0].trade_price); // 확인용
     return parseFloat(data[0].trade_price);
   } catch (err) {
     console.error('BTC 가격 가져오기 실패:', err);
@@ -62,7 +64,7 @@ async function calculateBTC() {
   }
 
   const startPrice = await fetchBtcPrice();
-  if (!startPrice) return;
+  if (!startPrice) return; // 가격 못 가져오면 종료
 
   let currentBtcPrice = startPrice;
   let month = 0;
@@ -84,6 +86,7 @@ async function calculateBTC() {
     currentBtcPrice *= (1 + monthlyRate);
   }
 
+  // 결과 표시
   document.getElementById('requiredMonths').textContent = month;
   document.getElementById('totalInvestment').textContent = formatInvestmentDisplay(month * monthlyInvestment);
   document.getElementById('monthlyTable').innerHTML = monthlyTableHtml;
