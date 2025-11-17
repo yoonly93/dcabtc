@@ -4,33 +4,33 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>비트코인 목표 수량 투자 계산기</title>
-  <link rel="stylesheet" href="style.css">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/feather-icons"></script>
+  <script src="app.js" defer></script>
 </head>
 <body class="bg-gray-50 p-4">
 
   <!-- 상단 카드형 입력 -->
-  <div class="max-w-xl mx-auto bg-white p-6 rounded-2xl shadow-lg space-y-4" id="inputCard">
+  <div class="max-w-xl mx-auto bg-white p-6 rounded-xl shadow-lg space-y-4" id="inputCard">
     <h1 class="text-2xl font-bold text-center">비트코인 목표 수량 투자 계산기</h1>
 
     <!-- 목표 BTC -->
     <div>
       <label class="block font-medium mb-1">목표 비트코인 개수</label>
-      <input type="number" id="targetBtc" class="w-full border p-3 rounded-xl text-lg" placeholder="예: 0.5">
+      <input type="number" id="targetBtc" class="w-full border p-3 rounded-lg text-lg" placeholder="예: 0.5">
     </div>
 
     <!-- 투입금액 -->
     <div class="relative">
       <label class="block font-medium mb-1">투입금액</label>
-      <input type="number" id="monthlyInvestment" class="w-full border p-3 rounded-2xl pr-12 text-lg" placeholder="예: 1000000" oninput="toggleClearIcon()">
+      <input type="number" id="monthlyInvestment" class="w-full border p-3 rounded-lg pr-12 text-lg" placeholder="예: 1000000" oninput="toggleClearIcon()">
       <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer" id="clearBtn" style="display:none;" onclick="clearInvestment()">
         <i data-feather="x-circle"></i>
       </span>
       <div class="flex space-x-2 mt-2">
-        <button type="button" onclick="addInvestment(100000)" class="flex-1 bg-gray-200 px-3 py-2 rounded-2xl">+10만원</button>
-        <button type="button" onclick="addInvestment(1000000)" class="flex-1 bg-gray-200 px-3 py-2 rounded-2xl">+100만원</button>
-        <button type="button" onclick="addInvestment(10000000)" class="flex-1 bg-gray-200 px-3 py-2 rounded-2xl">+1000만원</button>
+        <button type="button" onclick="addInvestment(100000)" class="flex-1 bg-gray-200 px-3 py-2 rounded-lg">+10만원</button>
+        <button type="button" onclick="addInvestment(1000000)" class="flex-1 bg-gray-200 px-3 py-2 rounded-lg">+100만원</button>
+        <button type="button" onclick="addInvestment(10000000)" class="flex-1 bg-gray-200 px-3 py-2 rounded-lg">+1000만원</button>
       </div>
       <div class="text-sm text-gray-500 mt-1" id="investmentDisplay">0원</div>
     </div>
@@ -38,27 +38,27 @@
     <!-- 월별 상승률 -->
     <div>
       <label class="block font-medium mb-1">월별 예상 상승률 (%)</label>
-      <input type="number" id="monthlyRate" class="w-full border p-3 rounded-xl text-lg" value="5">
+      <input type="number" id="monthlyRate" class="w-full border p-3 rounded-lg text-lg" value="5">
     </div>
 
     <!-- 확인하기 버튼 -->
-    <button onclick="calculateBTC()" class="w-full bg-orange-500 text-white py-3 rounded-2xl font-semibold text-lg hover:bg-orange-600 transition-colors">확인하기</button>
+    <button id="calculateBtn" class="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold text-lg hover:bg-orange-600 transition-colors">확인하기</button>
   </div>
 
   <!-- 계산 결과 카드 -->
-  <div class="max-w-xl mx-auto mt-6 bg-white p-6 rounded-2xl shadow-lg flex space-x-4 justify-around" id="resultCard" style="display:none;">
-    <div class="flex-1 bg-orange-100 p-4 rounded-xl text-center">
+  <div class="max-w-xl mx-auto mt-6 bg-white p-6 rounded-xl shadow-lg flex space-x-4 justify-around" id="resultCard" style="display:none;">
+    <div class="flex-1 bg-orange-100 p-4 rounded-lg text-center">
       <p class="text-gray-600 font-medium">필요기간</p>
       <p class="text-2xl font-bold" id="requiredMonths"></p>
     </div>
-    <div class="flex-1 bg-green-100 p-4 rounded-xl text-center">
+    <div class="flex-1 bg-green-100 p-4 rounded-lg text-center">
       <p class="text-gray-600 font-medium">총 투입 금액</p>
       <p class="text-2xl font-bold" id="totalInvestment"></p>
     </div>
   </div>
 
   <!-- 주의문구 -->
-  <div class="max-w-xl mx-auto mt-4 bg-yellow-100 p-4 rounded-xl text-sm text-gray-700 space-y-2">
+  <div class="max-w-xl mx-auto mt-4 bg-yellow-100 p-4 rounded-lg text-sm text-gray-700 space-y-2">
     <p class="font-semibold text-orange-600">주의사항</p>
     <p>이 계산기는 교육적 목적의 시뮬레이션이며, 실제 결과를 보장하지 않습니다.</p>
     <p class="font-medium mt-2">계산 방식:</p>
@@ -69,14 +69,14 @@
   <!-- 참고 버튼 -->
   <div class="max-w-xl mx-auto mt-4 text-center">
     <a href="https://btc-reach-calculator.vercel.app/" target="_blank"
-       class="inline-block w-full bg-white text-orange-500 border border-orange-500 font-semibold py-3 px-4 rounded-2xl hover:bg-orange-50 transition-colors">
+       class="inline-block w-full bg-white text-orange-500 border border-orange-500 font-semibold py-3 px-4 rounded-lg hover:bg-orange-50 transition-colors">
       한국에서 지금 200만원으로 비트코인을 사면 실제로 몇 개를 살 수 있을까?
     </a>
   </div>
 
   <!-- 월별 테이블 -->
   <div class="max-w-xl mx-auto mt-6 overflow-x-auto">
-    <table class="w-full table-auto border border-gray-200 bg-white rounded-2xl">
+    <table class="w-full table-auto border border-gray-200 bg-white rounded-lg">
       <thead class="bg-gray-50">
         <tr>
           <th class="border px-2 py-1">월차</th>
@@ -89,6 +89,5 @@
     </table>
   </div>
 
-  <script src="app.js"></script>
 </body>
 </html>
