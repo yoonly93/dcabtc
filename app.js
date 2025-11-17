@@ -84,28 +84,37 @@ async function calculateBTC() {
   let price = currentBtcPrice;
   if (!price) return alert('BTC 가격을 가져오지 못했습니다.');
 
+  const MAX_MONTHS = 1200; // 최대 루프 제한
   let month = 0;
   let accumulatedBtc = 0;
-  let monthlyTableHtml = '';
 
-  while (accumulatedBtc < targetBtc) {
+  const tbody = document.getElementById('monthlyTable');
+  tbody.innerHTML = ''; // 초기화
+
+  while (accumulatedBtc < targetBtc && month < MAX_MONTHS) {
     month++;
     const btcBought = monthlyInvestment / price;
     accumulatedBtc += btcBought;
 
-    monthlyTableHtml += `<tr>
+    // DOM으로 tr 생성
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
       <td class="border px-2 py-1">${month}개월차</td>
       <td class="border px-2 py-1">${formatWon(Math.round(price))}</td>
       <td class="border px-2 py-1">${btcBought.toFixed(6)}</td>
       <td class="border px-2 py-1">${accumulatedBtc.toFixed(6)}</td>
-    </tr>`;
+    `;
+    tbody.appendChild(tr);
 
     price *= (1 + monthlyRate);
   }
 
+  if (month >= MAX_MONTHS) {
+    alert("투입금액이 너무 적어 목표 BTC까지 도달하는 데 너무 많은 기간이 필요합니다.");
+  }
+
   document.getElementById('requiredMonths').textContent = month;
   document.getElementById('totalInvestment').textContent = formatInvestmentDisplay(month * monthlyInvestment);
-  document.getElementById('monthlyTable').innerHTML = monthlyTableHtml;
   document.getElementById('resultCard').style.display = 'flex';
 
   // fallback 주의문구
